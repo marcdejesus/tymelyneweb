@@ -47,6 +47,8 @@ npm install
 npm run dev
 ```
 
+4. Set up an account with EmailJS and put your information into Contact.jsx
+
 # 📄 License
 
 This project is licensed under the MIT License -- see the LICENSE file for details.
