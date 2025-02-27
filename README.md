@@ -22,6 +22,7 @@ A modern, responsive portfolio website built with React and Tailwind CSS showcas
 - [Lucide React](https://lucide.dev/) - Beautiful & consistent icons
 - [Class Variance Authority](https://cva.style/docs) - For UI component variants
 - [TailwindCSS Animate](https://github.com/jamiebuilds/tailwindcss-animate) - Animation utilities
+- [EmailJS](https://www.emailjs.com/) - Contact Form Handling
 
 ## 📋 Prerequisites
 

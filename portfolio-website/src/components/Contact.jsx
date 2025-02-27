@@ -1,9 +1,10 @@
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from './ui/card';
 import { Button } from './ui/button';
 import { Input } from './ui/input';
 import { Textarea } from './ui/textarea';
 import { Mail, Phone, MapPin, Send } from 'lucide-react';
+import emailjs from '@emailjs/browser';
 
 const Contact = () => {
   const [formData, setFormData] = useState({
@@ -11,6 +12,8 @@ const Contact = () => {
     email: '',
     message: '',
   });
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const formRef = useRef();
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -19,11 +22,26 @@ const Contact = () => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    console.log('Form submitted:', formData);
-    // Here you would typically handle the form submission, e.g., send data to a server
-    // Reset form after submission
-    setFormData({ name: '', email: '', message: '' });
-    alert('Thank you for your message! I will get back to you soon.');
+    setIsSubmitting(true);
+    
+    const serviceId = 'service_0c6szam';
+    const templateId = 'template_ja65zpf';
+    const publicKey = 'bsKkhpaKN_wm2DKbn';
+    
+    emailjs
+      .sendForm(serviceId, templateId, formRef.current, publicKey)
+      .then((result) => {
+        console.log('Email sent successfully:', result.text);
+        setFormData({ name: '', email: '', message: '' });
+        alert('Thank you for your message! I will get back to you soon.');
+      })
+      .catch((error) => {
+        console.error('Failed to send email:', error);
+        alert('Failed to send message. Please try again later.');
+      })
+      .finally(() => {
+        setIsSubmitting(false);
+      });
   };
 
   return (
@@ -43,7 +61,7 @@ const Contact = () => {
               </CardDescription>
             </CardHeader>
             <CardContent>
-              <form onSubmit={handleSubmit} className="space-y-4">
+              <form ref={formRef} onSubmit={handleSubmit} className="space-y-4">
                 <div className="space-y-2">
                   <label htmlFor="name" className="block text-sm font-medium">
                     Name
@@ -85,8 +103,9 @@ const Contact = () => {
                     required
                   />
                 </div>
-                <Button type="submit" className="w-full">
-                  <Send className="mr-2 h-4 w-4" /> Send Message
+                <Button type="submit" className="w-full" disabled={isSubmitting}>
+                  <Send className="mr-2 h-4 w-4" />
+                  {isSubmitting ? 'Sending...' : 'Send Message'}
                 </Button>
               </form>
             </CardContent>
