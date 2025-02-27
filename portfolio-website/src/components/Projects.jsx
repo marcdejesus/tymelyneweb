@@ -17,7 +17,7 @@ const Projects = () => {
     {
       id: 2,
       title: 'Isle of the Undead',
-      description: 'A sleek weather application showing current conditions and forecasts with location-based data.',
+      description: 'A 3D game built in Unity, where players must escape a zombie-infested prison. Uses an advanced wave-based spawn system to create a challenging experience.',
       tags: ['Unity', 'C#', '.NET'],
       imageUrl: '',
       liveUrl: 'https://youtu.be/U7LoJ6oCf_0',
