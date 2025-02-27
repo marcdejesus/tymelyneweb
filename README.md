@@ -2,7 +2,7 @@
 
 A modern, responsive portfolio website built with React and Tailwind CSS showcasing skills, projects, and contact information.
 
-![Portfolio Preview](https://imgur.com/a/IQyF3gF)
+![Portfolio Preview](https://i.imgur.com/Ejrv7w4.png)
 
 ## ✨ Features
 
