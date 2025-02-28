@@ -8,12 +8,20 @@ import {
   Users, 
   Settings, 
   Menu, 
-  ChevronLeft 
+  ChevronLeft,
+  LogOut 
 } from 'lucide-react';
-import { Link, useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
+import { useAuth } from '../contexts/AuthContext';
 
 const Sidebar = ({ currentPage, isCollapsed, toggleSidebar }) => {
   const navigate = useNavigate();
+  const { user, signOut } = useAuth();
+  
+  const handleSignOut = async () => {
+    await signOut();
+    navigate('/');
+  };
 
   const handleNavigation = (page) => {
     navigate(`/dashboard/${page === 'dashboard' ? '' : page}`);
@@ -28,6 +36,24 @@ const Sidebar = ({ currentPage, isCollapsed, toggleSidebar }) => {
     { id: 'community', label: 'Community', icon: <Users size={20} /> },
     { id: 'settings', label: 'Settings', icon: <Settings size={20} /> },
   ];
+
+  // Get user's initials for avatar
+  const getUserInitials = () => {
+    if (!user) return 'G';
+    
+    // If profile has first_name and last_name
+    if (user.profile?.first_name && user.profile?.last_name) {
+      return `${user.profile.first_name.charAt(0)}${user.profile.last_name.charAt(0)}`;
+    }
+    
+    // If username exists
+    if (user.profile?.username) {
+      return user.profile.username.charAt(0).toUpperCase();
+    }
+    
+    // Fallback to email
+    return user.email.charAt(0).toUpperCase();
+  };
 
   return (
     <aside 
@@ -71,16 +97,33 @@ const Sidebar = ({ currentPage, isCollapsed, toggleSidebar }) => {
       </nav>
 
       {/* User Profile */}
-      <div className="p-4 border-t dark:border-gray-700 flex items-center">
-        <div className="h-8 w-8 rounded-full bg-indigo-100 dark:bg-indigo-900/50 flex items-center justify-center text-indigo-700 dark:text-indigo-400 font-bold">
-          U
-        </div>
-        {!isCollapsed && (
-          <div className="ml-3">
-            <p className="font-medium text-sm text-gray-800 dark:text-gray-200">User Name</p>
-            <p className="text-xs text-gray-500 dark:text-gray-400">Level 12</p>
+      <div className="p-4 border-t dark:border-gray-700">
+        <div className="flex items-center">
+          <div className="h-8 w-8 rounded-full bg-indigo-100 dark:bg-indigo-900/50 flex items-center justify-center text-indigo-700 dark:text-indigo-400 font-bold">
+            {getUserInitials()}
           </div>
-        )}
+          {!isCollapsed && (
+            <div className="ml-3 flex-1">
+              <p className="font-medium text-sm text-gray-800 dark:text-gray-200">
+                {user?.profile?.username || user?.profile?.first_name || 'Guest'}
+              </p>
+              <p className="text-xs text-gray-500 dark:text-gray-400">
+                {user?.profile?.level ? `Level ${user.profile.level}` : 'Welcome!'}
+              </p>
+            </div>
+          )}
+          
+          {/* Sign out button */}
+          {!isCollapsed && (
+            <button 
+              onClick={handleSignOut}
+              className="p-1.5 rounded-md text-gray-500 dark:text-gray-400 hover:text-red-600 dark:hover:text-red-400 hover:bg-gray-100 dark:hover:bg-gray-700"
+              title="Sign Out"
+            >
+              <LogOut size={18} />
+            </button>
+          )}
+        </div>
       </div>
     </aside>
   );

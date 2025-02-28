@@ -1,12 +1,13 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import supabase from '../lib/supabaseClient';
+import { useAuth } from '../contexts/AuthContext';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
 import ThemeToggle from '../components/ThemeToggle';
 
 function SignIn() {
   const navigate = useNavigate();
+  const { signIn } = useAuth();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
@@ -15,7 +16,6 @@ function SignIn() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     
-    // Form validation
     if (email === '' || password === '') {
       setError('Please fill in all fields');
       return;
@@ -25,18 +25,11 @@ function SignIn() {
     setError('');
     
     try {
-      // Sign in with Supabase Auth
-      const { data, error: signInError } = await supabase.auth.signInWithPassword({
-        email: email,
-        password: password
-      });
+      const { data, error: signInError } = await signIn(email, password);
       
       if (signInError) throw signInError;
       
-      // Success - redirect to dashboard or home page
-      console.log('User signed in successfully:', data);
-      navigate('/dashboard'); // Or navigate to your desired route after login
-      
+      navigate('/dashboard');
     } catch (error) {
       console.error('Sign in error:', error);
       setError(error.message || 'An error occurred during sign in');
