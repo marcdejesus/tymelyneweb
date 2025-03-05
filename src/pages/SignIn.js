@@ -27,13 +27,22 @@ function SignIn() {
     try {
       const { data, error: signInError } = await signIn(email, password);
       
-      if (signInError) throw signInError;
+      if (signInError) {
+        setError(signInError.message || 'Failed to sign in');
+        setLoading(false);
+        return;
+      }
       
-      navigate('/dashboard');
+      // Check if data exists before navigating
+      if (data) {
+        navigate('/dashboard');
+      } else {
+        setError('No response from authentication service');
+        setLoading(false);
+      }
     } catch (error) {
       console.error('Sign in error:', error);
       setError(error.message || 'An error occurred during sign in');
-    } finally {
       setLoading(false);
     }
   };

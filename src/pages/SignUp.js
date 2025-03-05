@@ -76,13 +76,17 @@ function SignUp() {
           ]);
           
         if (profileError) throw profileError;
+        
+        // Success case - show alert and redirect
+        alert('Sign up successful! Please check your email to confirm your account.');
+        navigate('/signin');
+        return; // Exit the function after successful navigation
+      } else {
+        // User object doesn't exist in the response
+        throw new Error('Failed to create account. Please try again.');
       }
-      
-      // Success message and redirect
-      alert('Sign up successful! Please verify your email.');
-      navigate('/signin');
-      
     } catch (error) {
+      console.error('Sign up error:', error);
       setError(error.message || 'An error occurred during sign up');
     } finally {
       setLoading(false);

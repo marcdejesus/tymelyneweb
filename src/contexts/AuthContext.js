@@ -1,3 +1,4 @@
+// src/contexts/AuthContext.js
 import React, { createContext, useState, useEffect, useContext } from 'react';
 import supabase from '../lib/supabaseClient';
 
@@ -19,7 +20,7 @@ export const AuthProvider = ({ children }) => {
           const { data: userData } = await supabase.auth.getUser();
           
           if (userData?.user) {
-            // Get additional profile data if needed
+            // Get additional profile data
             const { data: profileData } = await supabase
               .from('profiles')
               .select('*')
@@ -60,7 +61,9 @@ export const AuthProvider = ({ children }) => {
     });
 
     return () => {
-      authListener.subscription.unsubscribe();
+      if (authListener?.subscription?.unsubscribe) {
+        authListener.subscription.unsubscribe();
+      }
     };
   }, []);
 
@@ -82,13 +85,60 @@ export const AuthProvider = ({ children }) => {
     try {
       const { error } = await supabase.auth.signOut();
       if (error) throw error;
+      setUser(null);  // Make sure this happens
+      return { error: null };
     } catch (error) {
       console.error('Error signing out:', error);
+      return { error };
+    }
+  };
+
+  // Add user stats update functions
+  const updateUserExperience = async (pointsToAdd) => {
+    if (!user) return { data: null, error: 'User not authenticated' };
+    
+    try {
+      const currentXP = user.profile.experience_points || 0;
+      const newXP = currentXP + pointsToAdd;
+      
+      // Calculate level (simple formula: level up every 1000 XP)
+      const currentLevel = user.profile.level || 1;
+      const newLevel = Math.floor(newXP / 1000) + 1;
+      
+      // Update profile
+      const { data, error } = await supabase
+        .from('profiles')
+        .update({
+          experience_points: newXP,
+          level: newLevel,
+          updated_at: new Date()
+        })
+        .eq('id', user.id)
+        .select()
+        .single();
+        
+      if (error) throw error;
+      
+      // Update local user state with new profile data
+      setUser({
+        ...user,
+        profile: data
+      });
+      
+      return { data, error: null, levelUp: newLevel > currentLevel };
+    } catch (error) {
+      return { data: null, error };
     }
   };
 
   return (
-    <AuthContext.Provider value={{ user, loading, signIn, signOut }}>
+    <AuthContext.Provider value={{ 
+      user, 
+      loading, 
+      signIn, 
+      signOut,
+      updateUserExperience
+    }}>
       {children}
     </AuthContext.Provider>
   );
